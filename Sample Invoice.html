@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta class="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <title>Sample_Invoice</title>
+
+    <style>
+        .container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 5px;
+            background-color: rgb(238, 238, 237);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 20px 20px;
+        }
+
+        .input-group-text {
+            padding-bottom: 3px;
+        }
+        .modal-dialog {
+            height: 50%;
+            width: 50%;
+        }
+    
+
+    </style>
+
+    <script>
+        $(document).ready(function () {
+            // Calculate total on keyup event for price inputs
+            $(document).on('keyup', '.quantity, .price, .adjustment', function () {
+                calculateTotal();
+            });
+
+            function calculateTotal() {
+                var total = 0;
+
+                // Loop through each row in the table
+                $('.invoiceTable tbody tr').each(function () {
+                    var quantity = parseFloat($(this).find('.quantity').val()) || 0;
+                    var price = parseFloat($(this).find('.price').val()) || 0;
+
+                    // Calculate subtotal for each row
+                    var subtotal = quantity * price;
+                    $(this).find('.amountP').val(subtotal.toFixed(2));
+
+                    // Add subtotal to the total
+                    total += subtotal;
+                });
+
+                // Update the total in the HTML
+                var adjustment = parseFloat($('.adjustment').val()) || 0;
+                var amountT = total + adjustment;
+                $('.amountT').val(amountT.toFixed(2));
+            }
+
+            $('#btnAdd').on('click', function () {
+                var newRow = $('#trow').clone().removeAttr('id').removeClass('d-none');
+                newRow.find('input').val('');
+                $('.invoiceTable tbody').append(newRow);
+            });
+
+            $(document).on('click', '.btnDel', function () {
+            var rowCount = $('.invoiceTable tbody tr').length;
+
+            if (rowCount > 1) {
+                $(this).closest('tr').remove();
+                calculateTotal();
+            } else {
+                alert('Cannot delete all rows. At least one row is required.');
+            }
+        });
+
+        });
+
+    </script>
+</head>
+
+<body>
+    
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h2><b>Billing Invoice</b></h2>
+                </div>
+
+                <div class="card body">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="col-sm-4 p-3">
+                                <span class="input-group-text" id="basic-addon1">Invoice for (Name):</span>
+                                <input type="text" class="form-control">
+                            </div>
+                            <div class="col-sm-4 p-3">
+                                <span class="input-group-text" id="basic-addon1">Payable to:</span>
+                                <input type="text" class="form-control">
+                            </div>
+                            <div class="col-sm-4 p-3">
+                                <span class="input-group-text" id="basic-addon1">Invoice Number:</span>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div class="col-md-4">  
+                         
+                            <div class="col-sm-4 p-3">
+                                <span class="input-group-text">Due Date:</span>
+                                <input type="text"class="form-control" >
+                               
+                            </div>
+                            <div class="col-sm-4 p-3">
+                                <span class="input-group-text" id="basic-addon1">Company Name:</span>
+                                <input type="text" class="form-control">
+                            </div>
+                            <div class="col-sm-4 p-3">
+                                <span class="input-group-text" id="basic-addon1">Address:</span>
+                                <input type="text"class="form-control">
+                            </div>
+                        </div>    
+                    </div>    
+                </div> 
+            </div> 
+                    <div class="col-md-12 mt-2">
+                        <table class="invoiceTable table table-bordered table-hover">
+                            <thead class="table-success">
+                                <tr>
+                                    <th scope="col" class="text-end text-center btn-primary">Item Name</th>
+                                    <th scope="col" class="text-end text-center btn-primary">Quantity</th>
+                                    <th scope="col" class="text-end text-center btn-primary">Item Price</th>
+                                    <th scope="col" class="text-end text-center btn-primary">Total Price</th>
+                                    <th scope="col" class="text-end text-center btn-primary">Actions</th> 
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr id="trow" class="d-none">
+                                    <td><input type="text" placeholder="Item Name" name="Item1" value="Item1"></td>
+                                    <td><input type="number" class = "quantity" placeholder="Quantity" oninput="this.value= this.value.replace(/[^0-9]/g, '-')"></td>
+                                    <td><input type="number" class = "price" placeholder="Item Price" name="UnitPrice" value="100"oninput="this.value= this.value.replace(/[^0-9]/g, '-')"></td>
+                                    <td><input type="number" placeholder="Total Price" class="amountP" class="form-control" name="Price" disabled></td>
+                                    <td><button type="button" class="btn btn-danger btn-block btnDel">Delete Item</button></td>
+                                </tr>
+
+                                <tr id="trow" class="d-none">
+                                    <td><input type="text" placeholder="Item Name" name="Item2" value="Item2"></td>
+                                    <td><input type="number" class = "quantity" placeholder="Quantity" oninput="this.value= this.value.replace(/[^0-9]/g, '-')"></td>
+                                    <td><input type="number" class = "price" placeholder="Item Price" name="UnitPrice" value="200"oninput="this.value= this.value.replace(/[^0-9]/g, '-')"></td>
+                                    <td><input type="number" placeholder="Total Price" class="amountP" class="form-control" name="Price" disabled></td>
+                                    <td><button type="button" class="btn btn-danger btn-block btnDel">Delete Item</button></td>
+                                </tr>
+                            </tbody>
+
+                                    <button type="button" class="btn btn-success" id="btnAdd">Add Item</button><br><br>          
+                        </table> 
+                                <tr>
+                                    <td colspan="2"></td>
+                                    <td colspan="1">
+                                    <b>Adjustment: </b><br>
+                                    <input type="number" class="adjustment"><br><br>
+                                    <b>Total Amount: </b><br>
+                                    <input type="Text" class="amountT" disabled><br><br>
+                                    </td>
+                                </tr>       
+    </body>
+    
+    <hr>
+
+    <div class="card">
+        <div class="card-header text-left">
+            <h2><b>User Data Management</b></h2><br>
+        </div>
+     <div class="row">
+        <div class="col col-sm-3">
+            <!-- <span class="input-group-text" id="basic-addon1">First Name</span> -->
+            <input type="text" placeholder="Enter First Name" class="form-control" id="fname">
+        </div>
+        <div class="col col-sm-3">
+            <!-- <span class="input-group-text" id="basic-addon1">Last Name</span> -->
+            <input type="text" placeholder="Enter Last Name" class="form-control" id="lname">
+        </div>
+        <div class="col col-sm-3">
+            <!-- <span class="input-group-text" id="basic-addon1">Gender</span> -->
+            <input type="text" placeholder="Enter your Gender" class="form-control" id="gender">
+        </div>
+        <div class="col col-sm-3">
+            <!-- <span class="input-group-text" id="basic-addon1">Email</span> -->
+            <input type="text" placeholder="Enter your Email" class="form-control" id="email">
+        </div>
+        <div class="col col-sm-5"><br>
+            <button type="button" class="btn btn-danger" id="btnShowPerson" data-toggle="modal" data-target="#samplemodal">Show</button>
+          
+        
+            <!-- modal button -->
+            <button type="button" class="btn btn-success" id="btnAddPerson">Add</button>
+            <div class="showPerson"></div>
+                
+     </div>
+ 
+        <!-- Modal -->
+        <div class="modal fade " id="samplemodal" tabindex="-1" role="dialog" aria-labelledby="samplemodalLabel" aria-hidden="true" role="dialog">
+            <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="samplemodalLabel">User Data</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body" id="myModal"></div>
+
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+    
+    
+<script>
+        
+        setInterval(function(){
+            callApi();
+        },3000);
+
+        $(document).ready(function(){
+            $("#btnAddPerson").click(function(){
+                alert("Add Successfully");
+               insert();
+            });
+
+            $("#btnShowPerson").click(function(){
+                callApi();
+            });//click
+
+        });//document
+
+        function callApi(){
+            $.ajax({
+                url: "https://dev.ecosyscorp.com/jenry/results.php", 
+                success: function(result){
+                    $("#myModal").html(result);
+                }
+            });//ajax
+        }
+        function insert(){
+            $.ajax({
+                url: "https://dev.ecosyscorp.com/jenry/insert.php",
+                type:'post',
+                data:{
+                    fname:$("#fname").val(),
+                    lname:$("#lname").val(),
+                    email:$("#email").val(),
+                    gender:$("#gender").val(),
+                }, 
+                success: function
+                (result){
+                    $(".showPerson").html(result);
+                }
+            });//ajax
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+        // Get the modal and buttons
+        var modal = document.getElementById("myModal");
+        var btnShowPerson = document.getElementById("btnShowPerson");
+        var closeModalBtn = document.getElementById("closeModalBtn");
+    
+        // Open the modal
+        btnShowPerson.onclick = function () {
+        modal.style.display = "block";
+        callApi();
+        };
+    
+        // Close the modal
+        closeModalBtn.onclick = function () {
+        modal.style.display = "none";
+        };
+    
+        // Close the modal if the overlay is clicked
+        window.onclick = function (event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+      }
+    };
+  });
+
+</script>    
+<hr>
+</head>
+</html>
